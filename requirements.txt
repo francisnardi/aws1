@@ -1,0 +1,9 @@
+attrs
+beautifulsoup4
+bs4
+chromedriver-py
+lxml
+pdflatex
+selenium
+soupsieve
+urllib3
