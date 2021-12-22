@@ -14,9 +14,10 @@ pip install -r requirements.txt
 ```
 4. Execute the script
 ``` bash
-python3 script.py
+python3 aws1.py
 ```
 5. Enjoy your generated study PDF
 ``` bash
-xdg-open pspo_q1.pdf 
+xdg-open f3.pdf
+xdg-open f4.pdf
 ```
