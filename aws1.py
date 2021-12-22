@@ -136,4 +136,6 @@ with open('f1.tex', 'w') as file:
 with open('f2.tex', 'w') as file:  
     file.write(gbrs)
 
-os.system("rm -rf f1.tex f2.tex *.aux *.log *.fls *.fdb_*")
+os.system("pdflatex f3.tex")
+os.system("pdflatex f4.tex")
+os.system("rm -rf *.aux *.log *.fls *.fdb_* *.gz")
