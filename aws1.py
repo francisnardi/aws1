@@ -1,6 +1,5 @@
 import os
 import time
-import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from chromedriver_py import binary_path
@@ -42,7 +41,9 @@ driver.quit()
 
 wpProQuiz_question_text = soup_lxml.find_all(class_='wpProQuiz_question_text')
 wpProQuiz_questionList = soup_lxml.find_all(class_='wpProQuiz_questionList')
+wpProQuiz_response = soup_lxml.find_all(class_='wpProQuiz_response')
 wpProQuiz_correct = soup_lxml.find_all(class_='wpProQuiz_correct')
+
 document = '\\begin{enumerate}\n'
 answer_key = '\\begin{enumerate}\n'
 perguntas = [(e.text).strip() for e in wpProQuiz_question_text]
@@ -96,6 +97,8 @@ gabarito = bytes(answer_key, 'utf-8').decode('utf-8', 'ignore')
 indices_perguntas = []
 possiveis_respostas = []
 respostas_corretas = []
+possiveis_explicacoes = []
+explicacoes_corretas = []
 
 lista_perguntas = soup_lxml.find_all('ul')
 lista = []
@@ -123,12 +126,35 @@ for i in range(len(respostas_corretas)):
     for j in range(len(respostas_corretas[i])):
         gabarito_resumido += "\t\item " + str(respostas_corretas[i][j]) + "\n"
     gabarito_resumido += "\\end{itemize}"
-    #gabarito_resumido = gabarito_resumido[:-2]
     gabarito_resumido += "\n\n"
 
 gabarito_resumido += '\\end{enumerate}\n'
 
+for b in range(len(wpProQuiz_response)):
+    possiveis_explicacoes.append(wpProQuiz_response[b].find_all('li'))
+    for c in range(len(possiveis_explicacoes[b])):
+        lista.append(possiveis_explicacoes[b][c].text.strip().replace('’', '\''))
+    explicacoes_corretas.append(lista)
+    lista = []
+
+gabarito_completo = ""
+gabarito_completo += '\\begin{enumerate}\n'
+
+for i in range(len(respostas_corretas)):
+    gabarito_completo += "\t% question " + str(i+1) + "\n\t\\item " + str(perguntas[i]) + "\n\n"
+    gabarito_completo += "\t\\begin{itemize}\n"
+    for j in range(len(respostas_corretas[i])):
+        gabarito_completo += "\t\item \\textbf{" + str(respostas_corretas[i][j]) + "}\n"
+    for k in range(len(explicacoes_corretas[i])):
+        link = str(explicacoes_corretas[i][k])
+        if link[0:4] != 'http':
+            gabarito_completo += "\t\item " + str(explicacoes_corretas[i][k]) + "\n"
+    gabarito_completo += "\t\\end{itemize}\n"
+    gabarito_completo += "\n\n"
+gabarito_completo += '\\end{enumerate}\n'
+
 gbrs = bytes(gabarito_resumido, 'utf-8').decode('utf-8', 'ignore')
+gbcp = bytes(gabarito_completo, 'utf-8').decode('utf-8', 'ignore')
 
 with open('f1.tex', 'w') as file:  
         file.write(prova)
@@ -136,6 +162,10 @@ with open('f1.tex', 'w') as file:
 with open('f2.tex', 'w') as file:  
     file.write(gbrs)
 
-os.system("pdflatex f3.tex")
-os.system("pdflatex f4.tex")
-os.system("rm -rf *.aux *.log *.fls *.fdb_* *.gz")
+with open('f3.tex', 'w') as file:  
+    file.write(gbcp)
+
+os.system("pdflatex 1-questionario.tex")
+os.system("pdflatex 2-gabarito.tex")
+os.system("pdflatex 3-estudo.tex")
+os.system("rm -rf f1.tex f2.tex f3.tex *.aux *.log *.fls *.fdb_* *.gz")

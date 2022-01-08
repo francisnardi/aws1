@@ -18,6 +18,7 @@ python3 aws1.py
 ```
 5. Enjoy your generated study PDF
 ``` bash
-xdg-open f3.pdf
 xdg-open f4.pdf
+xdg-open f5.pdf
+xdg-open f6.pdf
 ```
